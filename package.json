@@ -6,21 +6,37 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder --win",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "build:mac": "electron-builder --mac",
+    "build:all": "electron-builder --win --linux --mac",
     "build:portable": "electron-builder --win portable"
   },
   "build": {
-    "appId": "com.Zalo.desktop",
-    "productName": "Zalo",
+    "appId": "com.deplao.desktop",
+    "productName": "Dép Lào",
     "directories": {
       "output": "dist"
     },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "index.html",
+      "custom_style.css",
+      "icon.ico",
+      "icon.png",
+      "package.json"
+    ],
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
         }
       ],
       "icon": "icon.ico"
@@ -33,27 +49,44 @@
       "uninstallerIcon": "icon.ico",
       "shortcutName": "Dép Lào"
     },
-    "files": [
-      "main.js",
-      "preload.js",
-      "renderer.js",
-      "index.html",
-      "custom_style.css",
-      "icon.ico",
-      "icon.png",
-      "package.json"
-    ],
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.png",
+      "category": "Network"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "icon.png",
+      "category": "public.app-category.social-networking"
+    },
+    "dmg": {
+      "title": "Dép Lào ${version}",
+      "icon": "icon.png"
+    },
     "publish": [
       {
         "provider": "github",
-        "owner": "Tiodev71",
-        "repo": "Zalo"
+        "owner": "Tio-dev71",
+        "repo": "Deplao-App"
       }
     ]
   },
   "keywords": [
-    "Zalo",
-    "Zalo",
+    "deplao",
     "desktop",
     "electron"
   ],

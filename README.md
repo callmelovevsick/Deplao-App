@@ -1,69 +1,95 @@
-# Dép Lào
+<div align="center">
+  <img src="icon.png" width="100" alt="Dép Lào Logo" />
+  <h1>🩴 Dép Lào Desktop</h1>
+  <p>Ứng dụng Dép Lào Desktop — Chạy trên nhân Chrome (Chromium)</p>
 
-<p align="center">
-  <img src="icon.png" width="64" height="64" alt="Dép Lào" />
-</p>
-
-<p align="center">
-  <strong>Nguyễn Đình Thọ</strong><br>
-  Open Source Developer * Web Developer * Indicator Crypto
-</p>
-
-<p align="center">
-  <a href="https://t.me/tiodev71">💬 Telegram</a> ·
-  <a href="https://www.facebook.com/tiodev71/">📘 Facebook</a>
-</p>
+  [![Release](https://img.shields.io/github/v/release/Tio-dev71/Deplao-App?style=flat-square)](https://github.com/Tio-dev71/Deplao-App/releases/latest)
+  [![Windows](https://img.shields.io/badge/Windows-x64-blue?style=flat-square&logo=windows)](https://github.com/Tio-dev71/Deplao-App/releases/latest)
+  [![Linux](https://img.shields.io/badge/Linux-x64-orange?style=flat-square&logo=linux)](https://github.com/Tio-dev71/Deplao-App/releases/latest)
+  [![macOS](https://img.shields.io/badge/macOS-x64%20%7C%20arm64-lightgrey?style=flat-square&logo=apple)](https://github.com/Tio-dev71/Deplao-App/releases/latest)
+</div>
 
 ---
 
-**DepLao** là ứng dụng quản lý Zalo đa tài khoản (Multi-Account) chuyên nghiệp — được xây dựng trên nhân Chromium siêu tốc và bảo mật.
+## 📥 Tải về
 
-<p align="center">
-  <img src="preview.png" alt="DepLao Preview" style="max-width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);"/>
-</p>
+Vào trang [**Releases**](https://github.com/Tio-dev71/Deplao-App/releases/latest) để tải bản mới nhất:
 
-## 🛠️ Cài đặt & Sử dụng
+| Hệ điều hành | File | Ghi chú |
+|---|---|---|
+| 🪟 Windows | `*-Setup.exe` | Bản cài đặt |
+| 🪟 Windows | `*-Portable.exe` | Bản portable |
+| 🐧 Linux | `*.AppImage` | Chạy trực tiếp |
+| 🐧 Linux | `*.deb` | Ubuntu / Debian |
+| 🍎 macOS | `*.dmg` | Intel & Apple Silicon |
+
+---
+
+## 🛠️ Phát triển
 
 ### Yêu cầu
-- [Node.js](https://nodejs.org/) phiên bản LTS (20.x trở lên)
+- Node.js 18+
+- npm
 
-### Chạy thử môi trường Dev
+### Cài đặt & chạy
 ```bash
+git clone https://github.com/Tio-dev71/Deplao-App.git
+cd Deplao-App
 npm install
 npm start
 ```
 
-### Build phần mềm (.exe)
+### Build thủ công
 ```bash
-# Tạo file cài đặt (.exe)
-npm run build
+# Windows
+npm run build:win
 
-# Hoặc tạo bản portable (không cần cài đặt)
-npm run build:portable
+# Linux
+npm run build:linux
+
+# macOS
+npm run build:mac
+
+# Tất cả cùng lúc
+npm run build:all
 ```
-
-File thành phẩm sẽ xuất hiện trong thư mục `dist/`.
-
-### Xuất bản Cập nhật (Dành cho Developer)
-Để sử dụng tính năng **Auto Updater**, hãy chạy lệnh build sau (yêu cầu cấu hình `GH_TOKEN` environment variable):
-```bash
-npm run build -p always
-```
-Sau đó tạo Release mới trên Github và đính kèm 2 tệp trong thư mục `dist`: `DepLao Setup 1.0.0.exe` và `latest.yml`.
-
-## 📂 Cấu trúc dự án
-
-| File / Thư mục | Chức năng |
-|------|-------|
-| `main.js` | Quản lý vòng đời App, Hệ thống Partitions, BrowserView, IPC. |
-| `renderer.js` | Logic điều khiển Sidebar đa tài khoản, Modal UI. |
-| `index.html` | Khung Sidebar & Modal Overlay. |
-| `preload.js` | Cầu nối an toàn bảo mật giữa DOM và Backend. |
-| `custom_style.css`| Giao diện Dark Glass và tùy biến CSS cho Zalo. |
-| `preview.png` | Ảnh Dummy giao diện hiển thị. |
-
-## ⚠️ Lưu ý Bảo mật & Giới hạn
-- Mọi dữ liệu (Session, Cookies) được mã hóa và lưu tại `AppData` của máy cá nhân. DepLao **KHÔNG** gửi bất kỳ dữ liệu nhạy cảm nào ra máy chủ bên ngoài.
 
 ---
 
+## 🚀 Tạo Release mới
+
+1. Cập nhật `"version"` trong `package.json`
+2. Commit và push lên `main`
+3. Tạo tag và push:
+   ```bash
+   git tag v1.2.0
+   git push origin v1.2.0
+   ```
+4. GitHub Actions tự động build cho **Windows**, **Linux**, **macOS** và đăng lên **Releases** ✅
+
+> **Lưu ý:** Không cần cấu hình thêm secret — workflow dùng `GITHUB_TOKEN` có sẵn của GitHub.
+
+---
+
+## 📁 Cấu trúc project
+
+```
+Deplao-App/
+├── .github/
+│   └── workflows/
+│       ├── release.yml   # Auto build + release khi push tag
+│       └── build.yml     # Build thủ công theo platform
+├── main.js
+├── preload.js
+├── renderer.js
+├── index.html
+├── custom_style.css
+├── package.json
+└── icon.png / icon.ico
+```
+
+---
+
+## 📄 License
+
+MIT © [Tio-dev71](https://github.com/Tio-dev71)
