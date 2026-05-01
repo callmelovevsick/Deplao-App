@@ -19,6 +19,12 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+      - name: Fix icon.ico (convert from PNG)
+        shell: pwsh
+        run: |
+          # Dùng magick (ImageMagick) để tạo .ico đúng chuẩn từ PNG
+          choco install imagemagick -y --no-progress | Out-Null
+          magick icon.png -define icon:auto-resize=256,128,64,48,32,16 icon.ico
       - run: npm ci
       - name: Build Windows
         env:
@@ -44,7 +50,9 @@ jobs:
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libopenjp2-tools rpm fakeroot dpkg
+          sudo apt-get install -y rpm fakeroot dpkg imagemagick
+      - name: Fix icon.ico (convert from PNG)
+        run: convert icon.png -define icon:auto-resize=256,128,64,48,32,16 icon.ico
       - run: npm ci
       - name: Build Linux
         env:
@@ -68,11 +76,15 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+      - name: Fix icon.ico (convert from PNG)
+        run: |
+          brew install imagemagick
+          magick icon.png -define icon:auto-resize=256,128,64,48,32,16 icon.ico
       - run: npm ci
       - name: Build macOS
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false   # Tắt code signing (không cần Apple cert)
+          CSC_IDENTITY_AUTO_DISCOVERY: false
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
         run: npm run build:mac
       - uses: actions/upload-artifact@v4
@@ -108,8 +120,6 @@ jobs:
           body: |
             ## 🩴 Dép Lào ${{ github.ref_name }}
 
-            ### 📥 Tải về theo hệ điều hành
-
             | Hệ điều hành | File | Ghi chú |
             |---|---|---|
             | 🪟 Windows | `*-Setup.exe` | Bản cài đặt |
@@ -117,11 +127,5 @@ jobs:
             | 🐧 Linux | `*.AppImage` | Chạy trực tiếp |
             | 🐧 Linux | `*.deb` | Ubuntu / Debian |
             | 🍎 macOS | `*.dmg` | Intel & Apple Silicon |
-
-            ### 📌 Hướng dẫn
-            - **Windows**: Chạy file `.exe`
-            - **Linux AppImage**: `chmod +x *.AppImage && ./*.AppImage`
-            - **Linux deb**: `sudo dpkg -i *.deb`
-            - **macOS**: Mở `.dmg`, kéo app vào Applications
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

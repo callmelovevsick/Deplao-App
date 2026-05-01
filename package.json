@@ -32,11 +32,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "icon.ico"
@@ -53,11 +57,15 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "deb",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "icon.png",
@@ -67,7 +75,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "icon": "icon.png",
@@ -90,7 +101,10 @@
     "desktop",
     "electron"
   ],
-  "author": "Tiodev71",
+  "author": {
+    "name": "Tiodev71",
+    "email": "tiodev71@github.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "electron": "^29.0.0",
