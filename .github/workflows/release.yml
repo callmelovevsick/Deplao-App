@@ -3,37 +3,28 @@ name: Build & Release
 on:
   push:
     tags:
-      - 'v*'        # Kích hoạt khi push tag kiểu v1.0.0
-  workflow_dispatch:  # Cho phép chạy thủ công từ GitHub UI
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
-  contents: write   # Cần để tạo Release và upload artifacts
+  contents: write
 
 jobs:
-  # ─────────────── BUILD WINDOWS ───────────────
   build-windows:
     name: 🪟 Windows
     runs-on: windows-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Windows (NSIS Installer + Portable)
+      - run: npm ci
+      - name: Build Windows
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:win
-
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-dist
           path: |
@@ -41,30 +32,25 @@ jobs:
             dist/*.yml
           retention-days: 7
 
-  # ─────────────── BUILD LINUX ───────────────
   build-linux:
     name: 🐧 Linux
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Linux (AppImage + deb)
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenjp2-tools rpm fakeroot dpkg
+      - run: npm ci
+      - name: Build Linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:linux
-
-      - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-dist
           path: |
@@ -73,30 +59,23 @@ jobs:
             dist/*.yml
           retention-days: 7
 
-  # ─────────────── BUILD MACOS ───────────────
   build-macos:
     name: 🍎 macOS
     runs-on: macos-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build macOS (DMG - x64 & arm64)
+      - run: npm ci
+      - name: Build macOS
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false   # Tắt code signing (không cần Apple cert)
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
         run: npm run build:mac
-
-      - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: macos-dist
           path: |
@@ -104,24 +83,16 @@ jobs:
             dist/*.yml
           retention-days: 7
 
-  # ─────────────── CREATE GITHUB RELEASE ───────────────
   release:
     name: 🚀 Publish Release
     needs: [build-windows, build-linux, build-macos]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           path: release-artifacts
-
-      - name: List artifacts
-        run: find release-artifacts -type f | sort
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -141,16 +112,16 @@ jobs:
 
             | Hệ điều hành | File | Ghi chú |
             |---|---|---|
-            | 🪟 Windows | `*-Setup.exe` | Bản cài đặt (NSIS) |
-            | 🪟 Windows | `*-Portable.exe` | Bản portable, không cần cài |
-            | 🐧 Linux | `*.AppImage` | Chạy trực tiếp, không cài |
-            | 🐧 Linux | `*.deb` | Dành cho Ubuntu/Debian |
-            | 🍎 macOS | `*.dmg` | Hỗ trợ Intel (x64) & Apple Silicon (arm64) |
+            | 🪟 Windows | `*-Setup.exe` | Bản cài đặt |
+            | 🪟 Windows | `*-Portable.exe` | Bản portable |
+            | 🐧 Linux | `*.AppImage` | Chạy trực tiếp |
+            | 🐧 Linux | `*.deb` | Ubuntu / Debian |
+            | 🍎 macOS | `*.dmg` | Intel & Apple Silicon |
 
-            ### 📌 Hướng dẫn cài đặt
-            - **Windows**: Chạy file `.exe`, làm theo hướng dẫn
+            ### 📌 Hướng dẫn
+            - **Windows**: Chạy file `.exe`
             - **Linux AppImage**: `chmod +x *.AppImage && ./*.AppImage`
             - **Linux deb**: `sudo dpkg -i *.deb`
-            - **macOS**: Mở file `.dmg`, kéo app vào thư mục Applications
+            - **macOS**: Mở `.dmg`, kéo app vào Applications
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
